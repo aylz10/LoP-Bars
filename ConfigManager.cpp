@@ -26,6 +26,9 @@ void ConfigManager::LoadData()
 {
 	std::scoped_lock _{ configMutex };
 
+	//
+	keyOrder.clear();
+
 	configFile.open(wsFilePath, std::ios::in);
 
 	if (!configFile)
@@ -50,6 +53,8 @@ void ConfigManager::LoadData()
 
 		value = line.substr(pos + 1, line.size() - pos - 1);
 
+		//
+		keyOrder.push_back(key);  
 		configData[key] = value;
 	}
 
@@ -65,9 +70,13 @@ void ConfigManager::SaveData()
 	if (!configFile)
 		return;
 
-	for (auto& entry : configData)
+	//
+	for (const auto& key : keyOrder) 
 	{
-		configFile << entry.first << '=' << entry.second << std::endl;
+		auto it = configData.find(key);
+		if (it != configData.end()) {
+			configFile << it->first << '=' << it->second << std::endl;
+		}
 	}
 
 	configFile.close();
@@ -92,7 +101,31 @@ void ConfigManager::Set(const std::string& key, const std::string& value, bool s
 {
 	std::scoped_lock _{ configMutex };
 
-	configData[key] = value;
+	//
+	if (configData.find(key) == configData.end()) {
+		keyOrder.push_back(key);
+		configData[key] = value;
+	}
+
+	if (setAndSave)
+		SaveData();
+}
+
+void ConfigManager::Del(const std::string& key, bool setAndSave)
+{
+	std::scoped_lock _{ configMutex };
+
+	//
+	auto it = configData.find(key);
+	if (it != configData.end()) {
+		configData.erase(it);
+	}
+
+	//
+	auto vecIt = std::find(keyOrder.begin(), keyOrder.end(), key);
+	if (vecIt != keyOrder.end()) {
+		keyOrder.erase(vecIt);
+	}
 
 	if (setAndSave)
 		SaveData();

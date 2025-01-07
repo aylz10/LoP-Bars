@@ -167,6 +167,42 @@ bool LoPBars::Initialize()
 
 void LoPBars::Cleanup()
 {
+	if (!ConfigManager::GetInstance().Get<int>("ShowBasicStats")
+		|| !ConfigManager::GetInstance().Get<int>("ShowElementalBuildup")
+		|| !ConfigManager::GetInstance().Get<int>("ShowWeaponsDurability")
+		|| !ConfigManager::GetInstance().Get<int>("ShowHealth")
+		|| !ConfigManager::GetInstance().Get<int>("ShowStamina")
+		|| !ConfigManager::GetInstance().Get<int>("ShowTough")
+		|| !ConfigManager::GetInstance().Get<int>("ShowStagger")
+		|| !ConfigManager::GetInstance().Get<int>("ShowEmptBuildup")
+		|| !ConfigManager::GetInstance().Get<int>("ShowSeparator")
+		|| !ConfigManager::GetInstance().Get<float>("SizeRatio"))
+	{
+
+		ConfigManager::GetInstance().Del("ShowBasicStats");
+		ConfigManager::GetInstance().Del("ShowElementalBuildup");
+		ConfigManager::GetInstance().Del("ShowWeaponsDurability");
+		ConfigManager::GetInstance().Del("ShowHealth");
+		ConfigManager::GetInstance().Del("ShowStamina");
+		ConfigManager::GetInstance().Del("ShowTough");
+		ConfigManager::GetInstance().Del("ShowStagger");
+		ConfigManager::GetInstance().Del("ShowEmptBuildup");
+		ConfigManager::GetInstance().Del("ShowSeparator");
+		ConfigManager::GetInstance().Del("SizeRatio");
+
+
+		ConfigManager::GetInstance().Set<int>("ShowBasicStats", 1);
+		ConfigManager::GetInstance().Set<int>("ShowElementalBuildup", 1);
+		ConfigManager::GetInstance().Set<int>("ShowWeaponsDurability", 1);
+		ConfigManager::GetInstance().Set<int>("ShowHealth", 1);
+		ConfigManager::GetInstance().Set<int>("ShowStamina", 1);
+		ConfigManager::GetInstance().Set<int>("ShowTough", 1);
+		ConfigManager::GetInstance().Set<int>("ShowStagger", 1);
+		ConfigManager::GetInstance().Set<int>("ShowEmptBuildup", 1);
+		ConfigManager::GetInstance().Set<int>("ShowSeparator", 1);
+		ConfigManager::GetInstance().Set<float>("SizeRatio", 1.0f);
+	}
+
 	ConfigManager::GetInstance().SaveData();
 
 	if (D3D12Hook::GetInstance().IsHooked())

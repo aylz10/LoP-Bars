@@ -46,15 +46,22 @@ bool EntityBars::OnInitialize()
 	ptr = ptr + 0x20; // Move ptr to the call parameter
 	int offset = *(int*)ptr; // Read the function offset
 	ptr = ptr + sizeof(int); // Move ptr to the next instruction (after call)
-	ptr = ptr + offset; // Move ptr to the function address (in this case it's a vtable pointer)
-	if (*ptr != (char)0xE9) // This must be a jmp instruction, we are looking for a vtable reference here
+
+	//ptr = ptr + offset; // Move ptr to the function address (in this case it's a vtable pointer)
+	//if (*ptr != (char)0xE9) // This must be a jmp instruction, we are looking for a vtable reference here
+	//{
+	//	LOG_ERROR("Failed to locate GetLockOnSystem function address");
+	//	return false;
+	//}
+	//offset = *(int*)(++ptr); // Inc ptr and read the function offset
+	//ptr = ptr + sizeof(int); // Move ptr to the next instruction
+	//fix 1.5
+	ptr = ptr + offset; // Move ptr to the begining of the function
+	if (*ptr != (char)0x48 && *(ptr+1) != (char)0x83 && *(ptr + 4) != (char)0x48 && *(ptr + 5) != (char)0x8B && *(ptr + 6) != (char)0xB9) // This must be a jmp instruction, we are looking for a vtable reference here
 	{
 		LOG_ERROR("Failed to locate GetLockOnSystem function address");
 		return false;
 	}
-	offset = *(int*)(++ptr); // Inc ptr and read the function offset
-	ptr = ptr + sizeof(int); // Move ptr to the next instruction
-	ptr = ptr + offset; // Move ptr to the begining of the function
 	ptr = ptr + 7; // Move ptr to the offset of the static pointer
 	offset = *(int*)ptr; // Read the offset of the static pointer
 	ptr = ptr + sizeof(int); // Move ptr to the next instruction (after mov)
@@ -148,8 +155,8 @@ void EntityBars::ShowBasicStats(int iValues[], float fValues[], const ImVec2& pr
 				break;
 		}
 	}
-
-	ImGui::SeparatorText("Stats");
+	if (ConfigManager::GetInstance().Get<int>("ShowSeparator").value() != 0)
+		ImGui::SeparatorText("Stats");
 
 	// Health
 	//*(int*)(target.statList.pList + 0xC) = 1;
@@ -158,7 +165,8 @@ void EntityBars::ShowBasicStats(int iValues[], float fValues[], const ImVec2& pr
 	if (fMulStatValues[0] > 0.0f)
 		iValues[1] *= fMulStatValues[0];
 	std::string sText = std::format("Health ({}/{})", iValues[0], iValues[1]);
-	ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.4f, 0.0f, 0.0f, 1.0f));
+	if (ConfigManager::GetInstance().Get<int>("ShowHealth").value() != 0)
+		ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.4f, 0.0f, 0.0f, 1.0f));
 
 	// Stamina
 	iValues[0] = *(int*)(target.statList.pList + 0x3C);
@@ -166,7 +174,8 @@ void EntityBars::ShowBasicStats(int iValues[], float fValues[], const ImVec2& pr
 	if (fMulStatValues[1] > 0.0f)
 		iValues[1] *= fMulStatValues[1];
 	sText = std::format("Stamina ({}/{})", iValues[0], iValues[1]);
-	ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.0f, 0.4f, 0.0f, 1.0f));
+	if (ConfigManager::GetInstance().Get<int>("ShowStamina").value() != 0)
+		ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.0f, 0.4f, 0.0f, 1.0f));
 
 	// Tough
 	iValues[0] = *(int*)(target.statList.pList + 0x18C);
@@ -174,7 +183,8 @@ void EntityBars::ShowBasicStats(int iValues[], float fValues[], const ImVec2& pr
 	if (fMulStatValues[2] > 0.0f)
 		iValues[1] *= fMulStatValues[2];
 	sText = std::format("Posture ({}/{})", iValues[0], iValues[1]);
-	ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.5f, 0.0f, 0.5f, 1.0f));
+	if (ConfigManager::GetInstance().Get<int>("ShowTough").value() != 0)
+		ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.5f, 0.0f, 0.5f, 1.0f));
 
 	// Stagger
 	iValues[0] = *(int*)(target.statList.pList + 0x8DC); // Stagger point
@@ -184,14 +194,16 @@ void EntityBars::ShowBasicStats(int iValues[], float fValues[], const ImVec2& pr
 	{
 		fValues[0] = *(float*)(target.pBase + 0xF68); // Stagger retain/duration
 		sText = std::vformat("Stagger {:.2f}s"sv, std::make_format_args(fValues[0]));
-		ImGui::ProgressBar(fValues[0] / fValues[1], progressBarSize, sText.c_str(), ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+		if (ConfigManager::GetInstance().Get<int>("ShowStagger").value() != 0)
+			ImGui::ProgressBar(fValues[0] / fValues[1], progressBarSize, sText.c_str(), ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
 	}
 	else if (iValues[1] > 0)
 	{
 		if (fMulStatValues[3] > 0.0f)
 			iValues[1] *= fMulStatValues[3];
 		sText = std::format("Stagger ({}/{})", iValues[0], iValues[1]);
-		ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+		if (ConfigManager::GetInstance().Get<int>("ShowStagger").value() != 0)
+			ImGui::ProgressBar((float)iValues[0] / (float)iValues[1], progressBarSize, sText.c_str(), ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
 	}
 }
 
@@ -233,8 +245,8 @@ void EntityBars::ShowElementalBuildup(const ImVec2& progressBarSize)
 			std::format("{} {:.2f}s"sv, E_NAME[e], E_BAR_LIST[e].fValues[0]) :
 			std::format("{} ({}/{})"sv, E_NAME[e], (int)E_BAR_LIST[e].fValues[0], (int)E_BAR_LIST[e].fValues[1]);
 	}
-
-	ImGui::SeparatorText("Buildup");
+	if (ConfigManager::GetInstance().Get<int>("ShowSeparator").value() != 0)
+		ImGui::SeparatorText("Buildup");
 
 	for (char i = E_TYPE::FIRE; i < E_TYPE::COUNT; ++i)
 	{
@@ -243,6 +255,8 @@ void EntityBars::ShowElementalBuildup(const ImVec2& progressBarSize)
 			E_BAR_LIST[i].fValues[1] = (float)*(int*)(target.statList.pList + E_RESIST_OFFSET[i]); // Max buildup
 			E_BAR_LIST[i].sBarText = std::format("{} ({}/{})"sv, E_NAME[i], 0.0f, (int)E_BAR_LIST[i].fValues[1]);
 		}
+		if (ConfigManager::GetInstance().Get<int>("ShowEmptBuildup").value() == 0 && E_BAR_LIST[i].fValues[0] <= 0)
+			continue;
 		ImGui::ProgressBar(E_BAR_LIST[i].fValues[0] / E_BAR_LIST[i].fValues[1], progressBarSize, E_BAR_LIST[i].sBarText.c_str(), E_COLOR[i]);
 	}
 
@@ -264,7 +278,8 @@ void EntityBars::ShowWeaponsDurability(int iValues[], const ImVec2& progressBarS
 		if (bShowHeader)
 		{
 			bShowHeader = false;
-			ImGui::SeparatorText("Weapons");
+			if (ConfigManager::GetInstance().Get<int>("ShowSeparator").value() != 0)
+				ImGui::SeparatorText("Weapons");
 		}
 
 		iValues[1] = fnGetMaxDurability(pWeapon);
@@ -483,22 +498,31 @@ void EntityBars::OnDraw()
 		ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always, windowPosPivot);
 	}
 
-	static ImVec2 progressBarSize = ImVec2(-1.0f, ImGui::GetFontSize() + 7.0f);
+	float SizeRatio = ConfigManager::GetInstance().Get<float>("SizeRatio").value();
+	
+	auto& style = ImGui::GetStyle();
+	//style.WindowRounding = 0.0f;
+	//style.FrameRounding = 0.0f;
+	style.FrameBorderSize = 0.0f;
+	style.WindowBorderSize = 0.0f;
 
-	ImGui::SetNextWindowSize(ImVec2(220.0f, 0.0f));
-	ImGui::SetNextWindowBgAlpha(0.5f);
+	ImGui::SetNextWindowSize(ImVec2(220.0f * SizeRatio, 0.0f));
+	ImGui::SetNextWindowBgAlpha(0.0f);
 
 	if (ImGui::Begin("Entity Bars", nullptr, windowFlags))
 	{
+		ImGui::SetWindowFontScale(SizeRatio);
+		static ImVec2 progressBarSize = ImVec2(-1.0f, ImGui::GetFontSize() + 7.0f );
+
 		static int iValues[2];
 		static float fValues[2];
+		if (ConfigManager::GetInstance().Get<int>("ShowBasicStats").value() != 0)
+			ShowBasicStats(iValues, fValues, progressBarSize);
 
-		ShowBasicStats(iValues, fValues, progressBarSize);
-
-		if (target.abnormalStatList.iSize > -1)
+		if (ConfigManager::GetInstance().Get<int>("ShowElementalBuildup").value() != 0 && target.abnormalStatList.iSize > -1)
 			ShowElementalBuildup(progressBarSize);
 
-		if (target.weaponList.iSize > 0)
+		if (ConfigManager::GetInstance().Get<int>("ShowWeaponsDurability").value() != 0 && target.weaponList.iSize > 0)
 			ShowWeaponsDurability(iValues, progressBarSize);
 	}
 	ImGui::End();

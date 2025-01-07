@@ -1,0 +1,90 @@
+The pak file is pakchunk0_s4-WindowsNoEditor.pak.
+
+The uasset file is LiesofP\Content\ContentInfo\InfoAsset\AbnormalStateInfo.uasset.
+
+Search for "G_enchant_" and edit the value of "_duration".
+
+_buff_code_name
+
+
+G_enchant_fire_attack  40 000
+G_enchant_elec_attack  40 000
+G_enchant_acid_attack  40 000
+G_enchant_guard_boost  40 000
+G_enchant_destruction_boost  40 000  眩晕
+G_enchant_critical_boost  40 000
+G_enchant_frenzy_point_up  40 000
+G_enchant_tough_restore_decrease  15 000
+
+Enchant_fire_attack_buff  30 000
+Enchant_Elec_attack_buff  30 000
+Enchant_Acid_attack_buff  30 000
+
+Consume_stamina_restore_buff  20 000
+Consume_buff_all_elemental_resist  60 000 Root elemental_resist
+Consume_buff_all_special_resist  60 000 Root special_resist
+
+Drop_Ergo_Protector  60 000
+Consume_DropErgo_Save  300 000
+Consume_sensitive_off  30 000 Root Silence CatDust
+
+
+
+Consume_cancel_all_elemental -- 1
+Consume_cancel_special_elemental -- 1
+
+
+Buff_FrenzyPointUp -- 0
+Buff_SlaveMagazineUp -- 0
+
+monad_PC_HP_heal 30 000-10*20
+monad_PC_SP_max 40 000
+monad_PC_SMP_heal 1 000-15
+monad_mate_HP_heal 1 000
+monad_mate_suicide_bomb 20 000
+monad_mate_super_armor 40 000
+monad_mate_berserker 40 000
+monad_mate_guts 60 000
+monad_mate_fire_attack 40 000
+monad_mate_elec_attack 40 000
+monad_mate_acid_attack 40 000
+monad_PC_Atk_FableChargeUp 30 000
+monad_mate_provoke 20 000
+
+
+Consume_Epic_riddle_box_01_debuff
+Consume_Epic_riddle_box_02_debuff
+
+AbnormalStateChangeStatusInfo
+36
+          {
+            "_code_name": "G_enchant_destruction_boost",
+            "_target_stat_code_name": "ELSecondStat::E_DESTRUCTION_POWER",
+            "_target_first_stat_code_name": "ELFirstStat::E_NONE",
+            "_calculate_type": "ELAbnormalCSCalcType::E_MUL_ADD",
+            "_value": 4000,
+            "_mul_add_base_stat_code_name": "ELSecondStat::E_NONE"
+          },
+
+52
+          {
+            "_code_name": "monad_mate_berserker",
+            "_target_stat_code_name": "ELSecondStat::E_DESTRUCTION_POWER",
+            "_target_first_stat_code_name": "ELFirstStat::E_NONE",
+            "_calculate_type": "ELAbnormalCSCalcType::E_MUL_ADD",
+            "_value": 20000,
+            "_mul_add_base_stat_code_name": "ELSecondStat::E_NONE"
+          },
+
+40
+          {
+            "_code_name": "monad_PC_Atk_FableChargeUp",
+            "_target_stat_code_name": "ELSecondStat::E_ATTACK_GAIN_FRENZY_POINT_INCREASE_RATIO",
+            "_target_first_stat_code_name": "ELFirstStat::E_NONE",
+            "_calculate_type": "ELAbnormalCSCalcType::E_ADD",
+            "_value": 7500,
+            "_mul_add_base_stat_code_name": "ELSecondStat::E_NONE"
+          },
+
+ItemBladeInfo
+"_perfectguard_destruction_power": 38,
